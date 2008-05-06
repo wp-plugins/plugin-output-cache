@@ -1,6 +1,6 @@
 <?php
 /*
-Admin Pages for Plugin Output Cache
+Admin Pages for Plugin Output Cache 4.0.5
 */ 
 
 function poc_cache_manage_menu($nothing) {
@@ -65,6 +65,9 @@ function poc_cache_manage_page() {
 					<div class="submit">	
 					<input type="submit" name="delete_cache" value="<?php _e('Clear the Cache') ?>" />
 					</div>
+					<div class="submit">	
+					<input type="submit" name="refresh_display" value="<?php _e('Refresh Display') ?>" />
+					</div>
 				</td>
 				<td>
 					<?php
@@ -94,9 +97,12 @@ function poc_cache_install () {
 	$poc_table = $table_prefix.'poc_cache';
 	// clear any old-style entries
 	$wpdb->query("DELETE FROM `" . $wpdb->options . "` WHERE `option_name` LIKE 'poccache%'");
+	// drop any previous table
+	$sql = "DROP TABLE IF EXISTS `$poc_table`";
+	$wpdb->query($sql);
 	// install the new table
 	$sql = "CREATE TABLE IF NOT EXISTS `$poc_table` (
-		key_name char(32) NOT NULL, 
+		key_name char(32) NOT NULL COLLATE 'ascii_bin', 
 		data_value longtext NOT NULL,
 		PRIMARY KEY key_name (key_name)
 	) ENGINE = MyISAM;";

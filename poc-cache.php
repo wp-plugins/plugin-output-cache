@@ -4,10 +4,12 @@ Plugin Name: Plugin Output Cache
 Plugin URI: http://rmarsh.com/plugins/poc-cache/
 Description: Provides a caching mechanism for the output from plugins. Recent Posts and Recent Comments, etc,  use the cache automatically if it is installed. The cache is cleared whenever the blog content changes. Start at the <a href="edit.php?page=poc-cache/poc-cache-admin.php">Management page</a>.
 Author: Rob Marsh, SJ
-Version: 4.0.0
+Version: 4.0.5
 Author URI: http://rmarsh.com/
 */ 
 
+define('POC_CACHE', true);
+define('POC_CACHE_4', true);
 
 function poc_cache_fetch($key) {
 	global $poc_cache;
@@ -52,9 +54,7 @@ function poc_cache_timer_stop() {
 	
 */
 
-// don't change these 
-define('POC_CACHE', true);
-define('POC_CACHE_4', true);
+// don't change 
 $poc_table = $table_prefix.'poc_cache';
 
 class POC_Cache {
@@ -80,10 +80,14 @@ class POC_Cache {
 	function __destruct() {
 		if (!$this->active) return false;
 		global $poc_table;
+		$values = array();
 		foreach ($this->mstore as $key => $dummy) {
 			$data = $this->mcache[$key];
-			$data = base64_encode(gzcompress($data));
-			mysql_query("INSERT INTO `$poc_table` (`key_name`, `data_value`) VALUES ('$key', '$data')");
+			$values[] = "('$key','$data')";
+		}	
+		if ($values) {
+			$v = implode(',', $values);
+			mysql_query("INSERT INTO `$poc_table` (`key_name`, `data_value`) VALUES $v");
 		}
 		update_option('poc_hits', get_option('poc_hits') + $this->hits);		
 	}
@@ -101,7 +105,6 @@ class POC_Cache {
 			if (mysql_num_rows($result)) {
 				$row = mysql_fetch_row($result);
 				$data = $row[0];
-				$data = gzuncompress(base64_decode($data));
 				$this->mcache[$key] = $data;
 				if ($this->stats) ++$this->hits;
 				mysql_free_result($result);
