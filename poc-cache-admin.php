@@ -1,6 +1,6 @@
 <?php
 /*
-Admin Pages for Plugin Output Cache 4.0.5
+Admin Pages for Plugin Output Cache 4.0.6
 */ 
 
 function poc_cache_manage_menu($nothing) {

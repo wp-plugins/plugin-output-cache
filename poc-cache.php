@@ -4,7 +4,7 @@ Plugin Name: Plugin Output Cache
 Plugin URI: http://rmarsh.com/plugins/poc-cache/
 Description: Provides a caching mechanism for the output from plugins. Recent Posts and Recent Comments, etc,  use the cache automatically if it is installed. The cache is cleared whenever the blog content changes. Start at the <a href="edit.php?page=plugin-output-cache/poc-cache-admin.php">Management page</a>.
 Author: Rob Marsh, SJ
-Version: 4.0.5
+Version: 4.0.6
 Author URI: http://rmarsh.com/
 */ 
 
@@ -80,9 +80,10 @@ class POC_Cache {
 	function __destruct() {
 		if (!$this->active) return false;
 		global $poc_table;
+		// instead of many SQL queries we aggregate them and make just one
 		$values = array();
 		foreach ($this->mstore as $key => $dummy) {
-			$data = $this->mcache[$key];
+			$data = addslashes($this->mcache[$key]);
 			$values[] = "('$key','$data')";
 		}	
 		if ($values) {
@@ -102,7 +103,7 @@ class POC_Cache {
 			if ($this->stats) ++$this->hits;
 		} else {
 			$result = mysql_query("SELECT `data_value` FROM `$poc_table` WHERE key_name = '$key' LIMIT 1", $this->dbh);
-			if (mysql_num_rows($result)) {
+			if ($result && mysql_num_rows($result)) {
 				$row = mysql_fetch_row($result);
 				$data = $row[0];
 				$this->mcache[$key] = $data;

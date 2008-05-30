@@ -3,7 +3,7 @@ Contributors: RobMarsh
 Tags: cache, speed, plugins
 Requires at least: 1.5
 Tested up to: 2.5.1
-Stable tag: 4.0.5
+Stable tag: 4.0.6
 
 Plugin Output Cache can be used by other plugins to cache portions of their output for efficiency.
 
@@ -22,6 +22,9 @@ Plugin Output Cache is installed in 3 easy steps:
 
 == Version History ==
 
+* 4.0.6
+	* fixed bug with unescaped quotes
+	* fixed warning in error log
 * 4.0.5
 	* some speed improvements
 	* changes to work with automatic update
