@@ -4,12 +4,17 @@ Plugin Name: Plugin Output Cache
 Plugin URI: http://rmarsh.com/plugins/poc-cache/
 Description: Provides a caching mechanism for the output from plugins. Recent Posts and Recent Comments, etc,  use the cache automatically if it is installed. The cache is cleared whenever the blog content changes. Start at the <a href="edit.php?page=plugin-output-cache/poc-cache-admin.php">Management page</a>.
 Author: Rob Marsh, SJ
-Version: 4.0.6
+Version: 4.0.7
 Author URI: http://rmarsh.com/
 */ 
 
 define('POC_CACHE', true);
 define('POC_CACHE_4', true);
+
+/*
+	to activate logging to the PHP error log uncomment the line below
+*/
+//define('POC_DEBUG', true);
 
 function poc_cache_fetch($key) {
 	global $poc_cache;
@@ -72,6 +77,7 @@ class POC_Cache {
 
 	function __construct()	{
 		global $wpdb;
+		if (defined('POC_DEBUG')) error_log('POC_CACHE: '.__FUNCTION__);
 		$this->active = (bool) get_option('poc_active');
 		$this->stats = (bool) get_option('poc_stats');
 		$this->dbh = &$wpdb->dbh; // hitch a ride on the wp connection to minimize the number of database connections
@@ -79,6 +85,7 @@ class POC_Cache {
 	
 	function __destruct() {
 		if (!$this->active) return false;
+		if (defined('POC_DEBUG')) error_log('POC_CACHE: '.__FUNCTION__);
 		global $poc_table;
 		// instead of many SQL queries we aggregate them and make just one
 		$values = array();
@@ -88,14 +95,15 @@ class POC_Cache {
 		}	
 		if ($values) {
 			$v = implode(',', $values);
-			mysql_query("INSERT INTO `$poc_table` (`key_name`, `data_value`) VALUES $v");
+			mysql_query("INSERT INTO `$poc_table` (`key_name`, `data_value`) VALUES $v", $this->dbh);
 		}
-		update_option('poc_hits', get_option('poc_hits') + $this->hits);		
+		update_option('poc_hits', get_option('poc_hits') + $this->hits);	
 	}
 	
 	// if the data can be found in the cache it is returned, otherwise false is returned
 	function fetch($key) {
 		if (!$this->active) return false;
+		if (defined('POC_DEBUG')) error_log('POC_CACHE: '.__FUNCTION__);
 		global $poc_table;
 		$key = md5($key);
 		if (isset($this->mcache[$key])) {
@@ -121,6 +129,7 @@ class POC_Cache {
 	// way, i.e., after getting a false result from fetch, it is safe and avoids an
 	// extra query or two.
 	function store($key, $data) {
+		if (defined('POC_DEBUG')) error_log('POC_CACHE: '.__FUNCTION__);
 		if (!$this->active) return false;
 		$key = md5($key);
 		$this->mcache[$key] = $data;
@@ -139,9 +148,10 @@ class POC_Cache {
 	// count how many entries are cached
 	function count_entries() {
 		global $poc_table;
-		$result = mysql_query("SELECT COUNT(*) FROM $poc_table");
+		$result = mysql_query("SELECT COUNT(*) FROM $poc_table", $this->dbh);
 		if ($result)	{
 			$row = mysql_fetch_row($result);
+			mysql_free_result($result);
 			return $row[0];
 		}	
 		return 0;
@@ -197,9 +207,13 @@ function poc_cache_pre_invalidate($comment_id) {
 	return poc_cache_invalidate($comment_id);
 }
 
+global $poc_cache;
+
 // installs actions for all the hooks that might change our cached content
 function poc_cache_install_hooks(){
+	global $poc_cache;
 	if(function_exists('add_action')) {
+		if (defined('POC_DEBUG')) error_log('POC_CACHE: '.__FUNCTION__);
 		add_action('publish_post', 'poc_cache_invalidate', 1);
 		add_action('edit_post', 'poc_cache_invalidate', 1);
 		add_action('delete_post', 'poc_cache_invalidate', 1);
@@ -212,6 +226,7 @@ function poc_cache_install_hooks(){
 		add_action('edit_comment', 'poc_cache_pre_invalidate', 1);
 		add_action('wp_set_comment_status', 'poc_cache_pre_invalidate', 1);
 	}
+	$poc_cache = new POC_Cache;
 }
 
 //called when all plugins have loaded
@@ -222,6 +237,5 @@ if ( is_admin() ) {
 	require(dirname(__FILE__).'/poc-cache-admin.php');
 }
 
-$poc_cache = new POC_Cache;
 
 ?>

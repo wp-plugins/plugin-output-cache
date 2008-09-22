@@ -1,6 +1,6 @@
 <?php
 /*
-Admin Pages for Plugin Output Cache 4.0.6
+Admin Pages for Plugin Output Cache 4.0.7
 */ 
 
 function poc_cache_manage_menu($nothing) {
@@ -105,7 +105,7 @@ function poc_cache_install () {
 		key_name char(32) NOT NULL COLLATE 'ascii_bin', 
 		data_value longtext NOT NULL,
 		PRIMARY KEY key_name (key_name)
-	) ENGINE = MyISAM;";
+	) ENGINE = MyISAM DEFAULT CHARSET=utf8;"; 
 	$wpdb->query($sql);
 
 	// store default options
