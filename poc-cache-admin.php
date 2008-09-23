@@ -1,6 +1,6 @@
 <?php
 /*
-Admin Pages for Plugin Output Cache 4.0.7
+Admin Pages for Plugin Output Cache 4.0.8
 */ 
 
 function poc_cache_manage_menu($nothing) {
@@ -103,9 +103,9 @@ function poc_cache_install () {
 	// install the new table
 	$sql = "CREATE TABLE IF NOT EXISTS `$poc_table` (
 		key_name char(32) NOT NULL COLLATE 'ascii_bin', 
-		data_value longtext NOT NULL,
+		data_value longblob NOT NULL,
 		PRIMARY KEY key_name (key_name)
-	) ENGINE = MyISAM DEFAULT CHARSET=utf8;"; 
+	) ENGINE = MyISAM;"; 
 	$wpdb->query($sql);
 
 	// store default options

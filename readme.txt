@@ -3,7 +3,7 @@ Contributors: RobMarsh
 Tags: cache, speed, plugins
 Requires at least: 1.5
 Tested up to: 2.6.2
-Stable tag: 4.0.7
+Stable tag: 4.0.8
 
 Plugin Output Cache can be used by other plugins to cache portions of their output for efficiency.
 
@@ -22,6 +22,8 @@ Plugin Output Cache is installed in 3 easy steps:
 
 == Version History ==
 
+* 4.0.8
+	* fix for utf8 chars for earlier versions of MySQL
 * 4.0.7
 	* fix for utf8 chars
 * 4.0.6

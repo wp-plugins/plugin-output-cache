@@ -4,7 +4,7 @@ Plugin Name: Plugin Output Cache
 Plugin URI: http://rmarsh.com/plugins/poc-cache/
 Description: Provides a caching mechanism for the output from plugins. Recent Posts and Recent Comments, etc,  use the cache automatically if it is installed. The cache is cleared whenever the blog content changes. Start at the <a href="edit.php?page=plugin-output-cache/poc-cache-admin.php">Management page</a>.
 Author: Rob Marsh, SJ
-Version: 4.0.7
+Version: 4.0.8
 Author URI: http://rmarsh.com/
 */ 
 
